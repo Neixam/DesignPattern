@@ -12,31 +12,27 @@ public class SimpleGraphicsInstance implements Canvas {
 
     @Override
     public void drawEllipse(int x, int y, int width, int height, CanvasColor color) {
-        render = (g) -> {
-            render.accept(g);
+        render = render.andThen((g) -> {
             g.setColor(color.toColor());
             g.drawOval(x, y, width, height);
-        };
+        });
     }
 
     @Override
     public void drawRect(int x, int y, int width, int height, CanvasColor color) {
-        render = (g) -> {
-            render.accept(g);
+        render = render.andThen((g) -> {
             g.setColor(color.toColor());
             g.drawRect(x, y, width, height);
-        };
+        });
     }
 
     @Override
     public void drawLine(int x1, int y1, int x2, int y2, CanvasColor color) {
-        render = (g) -> {
-            render.accept(g);
+        render = render.andThen((g) -> {
             g.setColor(color.toColor());
             g.drawLine(x1, y1, x2, y2);
-        };
+        });
     }
-
 
     @Override
     public void setArea(String name, int width, int height) {
@@ -60,5 +56,6 @@ public class SimpleGraphicsInstance implements Canvas {
     @Override
     public void actualise() {
         area.render(render);
+        render = (g) -> {};
     }
 }

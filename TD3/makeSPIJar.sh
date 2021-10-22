@@ -2,8 +2,8 @@
 build_dir="./tmp_build"
 src_dir="./src"
 jarname="CoolGraphics.jar"
-interface_provided="fr.uge.poo.paint.ex8.Canvas"
-class_providing_the_interface="fr.uge.poo.paint.ex8.CoolGraphicsInstance"
+interface_provided="fr.uge.poo.paint.ex9.Canvas"
+class_providing_the_interface="fr.uge.poo.paint.ex9.CoolGraphicsInstance"
 included_classes=( "com.evilcorp.coolgraphics.CoolGraphics" "$interface_provided" "$class_providing_the_interface" )
 
 
