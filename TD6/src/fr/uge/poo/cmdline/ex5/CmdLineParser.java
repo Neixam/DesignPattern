@@ -1,7 +1,6 @@
-package fr.uge.poo.cmdline.ex4;
+package fr.uge.poo.cmdline.ex5;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 public class CmdLineParser {
@@ -82,5 +81,13 @@ public class CmdLineParser {
                 throw new RuntimeException("Need the option " + k);
         });
         return files;
+    }
+
+    public void usage() {
+        registeredOptions
+                .entrySet()
+                .stream()
+                .sorted()
+                .forEach(v -> System.out.println(v.getKey() + "\n" + v.getValue()));
     }
 }

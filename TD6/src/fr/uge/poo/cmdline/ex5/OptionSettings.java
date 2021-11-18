@@ -1,4 +1,4 @@
-package fr.uge.poo.cmdline.ex4;
+package fr.uge.poo.cmdline.ex5;
 
 import java.util.Iterator;
 import java.util.Objects;
@@ -9,6 +9,11 @@ public class OptionSettings {
         private Consumer<Iterator<String>> act = (it) ->  {};
         private int nb_param = 0;
         private boolean needable = false;
+        private String usage = "";
+
+        public void setUsage(String usage) {
+            this.usage = usage;
+        }
 
         public OptionSettingsBuilder setAct(Consumer<Iterator<String>> act) {
             this.act = act;
@@ -32,6 +37,7 @@ public class OptionSettings {
     private Consumer<Iterator<String>> act;
     private int nb_param;
     private boolean needable;
+    private String usage;
 
     private OptionSettings(OptionSettingsBuilder builder) {
         Objects.requireNonNull(builder.act);
@@ -40,6 +46,7 @@ public class OptionSettings {
         this.act = builder.act;
         this.nb_param = builder.nb_param;
         this.needable = builder.needable;
+        this.usage = builder.usage;
     }
 
     public void accept(Iterator<String> it) {
@@ -50,7 +57,18 @@ public class OptionSettings {
         return nb_param;
     }
 
+    public String getUsage() {
+        return usage;
+    }
+
     public boolean isNeedable() {
         return needable;
+    }
+
+    @Override
+    public String toString() {
+        return "\tnb_param=" + nb_param +
+                "\n\tneedable=" + needable +
+                "\n\t" + usage ;
     }
 }
