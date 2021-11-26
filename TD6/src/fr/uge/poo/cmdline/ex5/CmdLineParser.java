@@ -1,10 +1,30 @@
 package fr.uge.poo.cmdline.ex5;
 
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.IntConsumer;
 
 public class CmdLineParser {
     private final Map<String, OptionSettings> registeredOptions = new HashMap<>();
+
+    public void addOptionWithOneInt(String option, IntConsumer consumer) {
+        addOptionWithOneParameter(option, s -> consumer.accept(Integer.parseInt(s)));
+    }
+
+    public void addOptionWithTwoInt(String option, BiConsumer<Integer, Integer> biConsumer) {
+        addOption(option,
+                new OptionSettings.OptionSettingsBuilder()
+                        .setAct(it -> biConsumer.accept(Integer.parseInt(it.next()), Integer.parseInt(it.next())))
+                        .setNb_param(2));
+    }
+
+    public void addOptionInetAddress(String option, BiConsumer<String, Integer> biConsumer) {
+        addOption(option,
+                new OptionSettings.OptionSettingsBuilder()
+                        .setAct(it -> biConsumer.accept(it.next(), Integer.parseInt(it.next())))
+                        .setNb_param(2));
+    }
 
 
     public void addFlag(String option, Runnable run) {
@@ -58,11 +78,25 @@ public class CmdLineParser {
      */
     public List<String> process(String[] arguments) {
         var files = new ArrayList<String>();
+        var allOptions = registeredOptions.values()
+                .stream()
+                .map(v -> v.getOtherName())
+                .reduce(new ArrayList<>(), (a, v) -> {
+                    a.addAll(v);
+                    return a;
+                });
         for (var i = 0; i < arguments.length; i++) {
             if (arguments[i].startsWith("-")) {
                 var tmp = registeredOptions.get(arguments[i]);
-                if (tmp == null)
-                    throw new RuntimeException("Option " + arguments[i] + " is not valid");
+                if (tmp == null) {
+                    if (!allOptions.contains(arguments[1]))
+                        throw new RuntimeException("Option " + arguments[i] + " is not valid");
+                    tmp = registeredOptions.values()
+                            .stream()
+                            .filter(v -> v.getOtherName().contains(arguments[1]))
+                            .findFirst()
+                            .get();
+                }
                 if (i + tmp.getNb_param() >= arguments.length)
                     throw new RuntimeException("Not enough parameter for option " + arguments[i]);
                 for (var j = 1; j <= tmp.getNb_param(); j++) {
@@ -77,17 +111,20 @@ public class CmdLineParser {
             }
         }
         registeredOptions.forEach((k, v) -> {
-            if (v.isNeedable() && !Arrays.asList(arguments).contains(k))
+            if (v.isNeedable() && (!Arrays.asList(arguments).contains(k)
+                    && v.getOtherName().stream().anyMatch(s -> Arrays.asList(arguments).contains(s))))
                 throw new RuntimeException("Need the option " + k);
         });
         return files;
     }
 
-    public void usage() {
-        registeredOptions
-                .entrySet()
+    public String usage() {
+        return registeredOptions
+                .keySet()
                 .stream()
-                .sorted()
-                .forEach(v -> System.out.println(v.getKey() + "\n" + v.getValue()));
+                .sorted(String::compareTo)
+                .map(s -> new StringJoiner("\n").add(s))
+                .reduce(new StringJoiner("\n"), (a, k) -> a.add(k + "\n" + registeredOptions.get(k.toString())))
+                .toString();
     }
 }

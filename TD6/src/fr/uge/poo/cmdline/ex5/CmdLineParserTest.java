@@ -146,4 +146,43 @@ class CmdLineParserTest {
         String[] arguments={"bonjour", "lala", "coco", "-donut", "donjj", "-koko"};
         assertThrows(RuntimeException.class, () -> parser.process(arguments));
     }
+
+    @Test
+    public void processUsageBasicTest() {
+        var parser = new CmdLineParser();
+        var ref = new Object() {
+            String donut = "";
+            int boum = 0;
+            boolean koko = false;
+        };
+        parser.addOption("-donut",
+                new OptionSettings.OptionSettingsBuilder()
+                        .setAct((s) -> ref.donut = s.next())
+                        .setNb_param(1)
+                        .setNeedable(false));
+        parser.addOption("-boum",
+                new OptionSettings.OptionSettingsBuilder()
+                        .setAct((s) -> ref.boum = Integer.parseInt(s.next()))
+                        .setNb_param(1)
+                        .setNeedable(true));
+        parser.addOption("-koko",
+                new OptionSettings.OptionSettingsBuilder()
+                        .setAct((s) -> ref.koko = true)
+                        .setOtherName("--kool", "-he").setUsage("set ref.koko to true"));
+        assertEquals("-boum\n" +
+                "\tother names : \n" +
+                "\tnb_param=1\n" +
+                "\tneedable=true\n" +
+                "\t\n" +
+                "-donut\n" +
+                "\tother names : \n" +
+                "\tnb_param=1\n" +
+                "\tneedable=false\n" +
+                "\t\n" +
+                "-koko\n" +
+                "\tother names : --kool, -he\n" +
+                "\tnb_param=0\n" +
+                "\tneedable=false\n" +
+                "\tset ref.koko to true", parser.usage());
+    }
 }

@@ -1,7 +1,6 @@
 package fr.uge.poo.cmdline.ex5;
 
-import java.util.Iterator;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class OptionSettings {
@@ -10,9 +9,11 @@ public class OptionSettings {
         private int nb_param = 0;
         private boolean needable = false;
         private String usage = "";
+        private final List<String> otherName = new ArrayList<>();
 
-        public void setUsage(String usage) {
+        public OptionSettingsBuilder setUsage(String usage) {
             this.usage = usage;
+            return this;
         }
 
         public OptionSettingsBuilder setAct(Consumer<Iterator<String>> act) {
@@ -30,6 +31,16 @@ public class OptionSettings {
             return this;
         }
 
+        public OptionSettingsBuilder setOtherName(String ...names) {
+            this.otherName.addAll(List.of(names));
+            return this;
+        }
+
+        public OptionSettingsBuilder setOtherName(List<String> names) {
+            this.otherName.addAll(names);
+            return this;
+        }
+
         public OptionSettings build() {
             return new OptionSettings(this);
         }
@@ -38,6 +49,7 @@ public class OptionSettings {
     private int nb_param;
     private boolean needable;
     private String usage;
+    private final List<String> otherName = new ArrayList<>();
 
     private OptionSettings(OptionSettingsBuilder builder) {
         Objects.requireNonNull(builder.act);
@@ -47,6 +59,7 @@ public class OptionSettings {
         this.nb_param = builder.nb_param;
         this.needable = builder.needable;
         this.usage = builder.usage;
+        this.otherName.addAll(builder.otherName);
     }
 
     public void accept(Iterator<String> it) {
@@ -61,13 +74,23 @@ public class OptionSettings {
         return usage;
     }
 
+    public List<String> getOtherName() {
+        return List.copyOf(otherName);
+    }
+
     public boolean isNeedable() {
         return needable;
     }
 
     @Override
     public String toString() {
-        return "\tnb_param=" + nb_param +
+        var ret = "";
+        var otherNames = otherName.stream().map(s -> new StringJoiner(", ").add(s))
+                .reduce(new StringJoiner(", "), (a, v) -> a.add(v.toString()));
+        if (!otherNames.equals(""))
+            ret = "\tother names : " + otherNames;
+        return  ret +
+                "\n\tnb_param=" + nb_param +
                 "\n\tneedable=" + needable +
                 "\n\t" + usage ;
     }
