@@ -1,6 +1,6 @@
 package ex2.fr.uge.poo.visitors.expr;
 
-public interface ExprVisitor {
-    int visitValue(Value value, StringBuilder stringBuilder);
-    int visitBinOp(BinOp binOp, StringBuilder stringBuilder);
+public interface ExprVisitor<E> {
+    E visitValue(Value value);
+    E visitBinOp(BinOp binOp);
 }
